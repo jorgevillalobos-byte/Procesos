@@ -1,261 +1,140 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proceso Foundation - Swimlane</title>
+@startuml
+' =========================================================
+' FOUNDATION | SWIMLANE HORIZONTAL (POR DEPARTAMENTO)
+' =========================================================
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:#f4f6f8;
-  color:#111;
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 14
+skinparam dpi 180
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+
+' Swimlanes como columnas (horizontal)
+skinparam swimlaneOrientation horizontal
+
+' Actividades (look profesional)
+skinparam activity {
+  BackgroundColor #FFFFFF
+  BorderColor #111827
+  FontColor #111827
+  StartColor #111827
+  EndColor #111827
+  BarColor #111827
 }
 
-.header{
-  padding:20px;
-  text-align:center;
-  background:white;
-  border-bottom:1px solid #e6e6e6;
+' Encabezado de lanes
+skinparam partition {
+  BorderColor #111827
+  FontColor #111827
+  FontStyle bold
 }
 
-.header h1{
-  margin:0;
-  font-size:22px;
+title Foundation — Flujo Operativo (Swimlane horizontal por Departamento)
+
+start
+
+' =========================================================
+' 1) Ventas -> Billing
+' =========================================================
+partition "Ventas" #E0F2FE {
+  :Pasa orden de venta a Billing;
 }
 
-.board{
-  display:flex;
-  gap:20px;
-  padding:20px;
-  overflow-x:auto;
+partition "Billing (Auditoría)" #FDF2F8 {
+  :Audita la venta\n(Producto: "Foundation");
+  if (¿Venta aprobada?) then (Sí)
+    :Aprobada → enviar a Onboarding\n(SLA: 24h creación de proyecto);
+  else (No)
+    :Rechazo/Corrección con Ventas\n(Proceso NO definido);
+    -->[Retorna] :Ventas revisa/corrige\n(pendiente de definición);
+    stop
+  endif
 }
 
-.lane{
-  min-width:280px;
-  background:white;
-  border-radius:16px;
-  border:1px solid #e6e6e6;
-  display:flex;
-  flex-direction:column;
+' =========================================================
+' 2) Onboarding crea proyecto y asigna a SEO
+' =========================================================
+partition "Onboarding" #FFF7ED {
+  :Crea el proyecto\n(SLA: 24h);
+  :Asigna a SEO (Especialista Foundation);
 }
 
-.lane-title{
-  padding:12px;
-  font-weight:bold;
-  font-size:14px;
-  background:#fafafa;
-  border-bottom:1px solid #e6e6e6;
-  border-radius:16px 16px 0 0;
-  text-align:center;
+' =========================================================
+' 3) SEO Especialista (Welcome Call) -> asigna a SEO Técnico
+' =========================================================
+partition "SEO" #ECFDF5 {
+  :Especialista Foundation:\nContacta y realiza Welcome Call\n(SLA: 24–48h);
+  :Asigna a SEO Técnico (Keyword Research);
+  :SEO Técnico:\nKeyword Research\n(SLA: 24h);
+  :Asigna de vuelta a Onboarding;
 }
 
-.lane-body{
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+' =========================================================
+' 4) Onboarding dispara asignaciones paralelas
+' =========================================================
+partition "Onboarding" #FFF7ED {
+  :Inicia asignaciones paralelas;
+  fork
+    :Asigna a Contenido;
+  fork again
+    :Asigna a IT (Compra de dominio);
+  fork again
+    :Asigna a Landing Pages (9 LPs);
+  end fork
 }
 
-.card{
-  background:#ffffff;
-  border:1px solid #e6e6e6;
-  border-radius:14px;
-  padding:12px;
-  font-size:13px;
-  box-shadow:0 1px 2px rgba(0,0,0,0.04);
+' =========================================================
+' 5) Paralelos: Contenido / IT / Landing Pages
+' =========================================================
+partition "Contenido" #FEF3C7 {
+  :Claudia Baldizón:\nCrea contenido del sitio\n(SLA: 24–48h);
+  :Contenido listo → asigna a\nSEO Técnico (Daniela Morales)\npara empaquetado final;
 }
 
-.card h3{
-  margin:4px 0 6px 0;
-  font-size:14px;
+partition "IT" #DBEAFE {
+  :Compra de dominio\n(SLA: no definido);
 }
 
-.meta{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
+partition "Landing Pages" #EDE9FE {
+  :Jasser/Yasser Morales:\nCrea contenido de 9 landing pages\n(SLA: 48–72h);
 }
 
-.pill{
-  font-size:11px;
-  padding:4px 8px;
-  border-radius:999px;
-  border:1px solid #ddd;
-  background:#f5f5f5;
+' =========================================================
+' 6) Empaquetado final -> Desarrollo -> Revisión final (SEO)
+' =========================================================
+partition "SEO" #ECFDF5 {
+  :Daniela Morales (SEO Técnico):\nEmpaquetado final;
+  :Asigna a Desarrollo\n(SLA: 24–48h);
 }
 
-.decision{
-  border:1px dashed #cfcfcf;
-  border-radius:14px;
-  padding:10px;
-  background:#fcfcfc;
+partition "Desarrollo" #DCFCE7 {
+  :Crear cuenta en Elite Plus;
+  :Crear el sitio;
+  :Entrega a SEO Técnico\npara revisión final +\nculminar herramientas (setups finales);
 }
 
-.decision-title{
-  font-weight:bold;
-  font-size:13px;
-  margin-bottom:6px;
+partition "SEO" #ECFDF5 {
+  :Revisión final (SEO Técnico)\n+ setups finales;
+  :Asigna a Especialista Foundation\n(Entrega al cliente);
+  :Especialista Foundation:\nEntrega del sitio al cliente;
 }
 
-.option{
-  font-size:12px;
-  margin-bottom:4px;
+' =========================================================
+' 7) Decisión del cliente
+' =========================================================
+partition "Cliente" #FFE4E6 {
+  if (¿Cliente aprueba el sitio?) then (Sí / Aprobado)
+    :Aprobado → asignar a\nYasser Morales\npara creación de blogs;
+    stop
+  else (No / Cambios)
+    :Pide cambios contra entrega\n→ asignar a SEO Técnico;
+  endif
 }
 
-.flow-indicator{
-  text-align:center;
-  padding:10px;
-  font-size:13px;
-  color:#666;
+partition "SEO" #ECFDF5 {
+  :Gestiona cambios solicitados\n(pendiente de loop formal);
 }
 
-.footer-flow{
-  margin:20px;
-  padding:14px;
-  background:white;
-  border-radius:14px;
-  border:1px solid #e6e6e6;
-  font-size:13px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="header">
-  <h1>Proceso Operativo - Producto Foundation</h1>
-  <div class="flow-indicator">
-    Flujo principal: Ventas → Billing → Onboarding → SEO → Desarrollo → SEO → Entrega → Blogs / Cambios
-  </div>
-</div>
-
-<div class="board">
-
-  <!-- Ventas -->
-  <div class="lane">
-    <div class="lane-title">Ventas</div>
-    <div class="lane-body">
-      <div class="card">
-        <div class="meta">
-          <span class="pill">Paso 1</span>
-        </div>
-        <h3>Enviar orden de venta</h3>
-        <p>Ventas transfiere la orden a Billing.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Billing -->
-  <div class="lane">
-    <div class="lane-title">Billing</div>
-    <div class="lane-body">
-
-      <div class="card">
-        <div class="meta">
-          <span class="pill">Paso 2</span>
-          <span class="pill">Auditoría</span>
-        </div>
-        <h3>Auditar venta Foundation</h3>
-      </div>
-
-      <div class="decision">
-        <div class="decision-title">¿Venta aprobada?</div>
-        <div class="option">✔ SI → Onboarding (24h creación proyecto)</div>
-        <div class="option">✖ NO → Corrección / Revisión</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Onboarding -->
-  <div class="lane">
-    <div class="lane-title">Onboarding</div>
-    <div class="lane-body">
-
-      <div class="card">
-        <div class="meta">
-          <span class="pill">SLA 24h</span>
-        </div>
-        <h3>Crear Proyecto</h3>
-      </div>
-
-      <div class="card">
-        <h3>Asignaciones Paralelas</h3>
-        <p>• Contenido (Claudia) 24–48h<br>
-           • IT Compra Dominio<br>
-           • Jasser Morales (9 Landing Pages) 48–72h
-        </p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- SEO -->
-  <div class="lane">
-    <div class="lane-title">SEO</div>
-    <div class="lane-body">
-
-      <div class="card">
-        <div class="meta">
-          <span class="pill">24–48h</span>
-        </div>
-        <h3>Welcome Call</h3>
-      </div>
-
-      <div class="card">
-        <div class="meta">
-          <span class="pill">24h</span>
-        </div>
-        <h3>Keyword Research</h3>
-      </div>
-
-      <div class="card">
-        <h3>Empaquetado Final</h3>
-        <p>Daniela Morales prepara para Desarrollo.</p>
-      </div>
-
-      <div class="card">
-        <h3>Revisión Final + Herramientas</h3>
-      </div>
-
-      <div class="decision">
-        <div class="decision-title">¿Cliente aprueba?</div>
-        <div class="option">✔ SI → Blogs (Jasser Morales)</div>
-        <div class="option">✖ NO → Cambios → Técnico SEO</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Desarrollo -->
-  <div class="lane">
-    <div class="lane-title">Desarrollo</div>
-    <div class="lane-body">
-
-      <div class="card">
-        <div class="meta">
-          <span class="pill">24–48h</span>
-        </div>
-        <h3>Crear cuenta Elite Plus + Sitio</h3>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<div class="footer-flow">
-<strong>Resumen del SLA crítico:</strong><br>
-• Onboarding: 24h creación proyecto<br>
-• Welcome Call: 24–48h<br>
-• Keyword Research: 24h<br>
-• Contenido: 24–48h<br>
-• Landing Pages (Jasser): 48–72h<br>
-• Desarrollo: 24–48h
-</div>
-
-</body>
-</html>
+stop
+@enduml
